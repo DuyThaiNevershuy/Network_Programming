@@ -6,6 +6,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
+#include <netinet/in.h>
 int main(int argc, char *argv[]){
      int client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
      printf("So tham so dau vao: %d\n",argc);

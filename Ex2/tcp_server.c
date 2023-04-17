@@ -18,16 +18,16 @@ int main(int argc, char *argv[]){
      addr.sin_port = htons(9000);
 
      if (bind(listener, (struct sockaddr *)&addr, sizeof(addr)))
-    {
-        perror("bind() failed");
-        return 1;        
-    }
+     {
+          perror("bind() failed");
+          return 1;        
+     }
 
-    if (listen(listener, 5))
-    {
-        perror("listen() failed");
-        return 1;
-    }
+     if (listen(listener, 5))
+     {
+          perror("listen() failed");
+          return 1;
+     }
 
      printf("Da khoi tao server thanh cong!\n");
 
