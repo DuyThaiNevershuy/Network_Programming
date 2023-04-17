@@ -25,22 +25,22 @@ int main(int argc, char *argv[]){
           addr.sin_port = htons(atoi(argv[2]));
      };
 
-     int ret = connect(client, (struct sockaddr *)&addr, sizeof(addr));
-     if (ret == -1)
+     int res = connect(client, (struct sockaddr *)&addr, sizeof(addr));
+     if (res == -1)
      {
           perror("connect() failed");
           return 1;
      }
 
-     char *msg = "Hello server\n";
-     send(client, msg, strlen(msg), 0);
+     // char *msg = "Hello server\n";
+     // send(client, msg, strlen(msg), 0);
      
-     char buf[256];
+     char buf[2048];
      while(1){
-          ret = recv(client,buf, sizeof(buf), 0);
+          int ret = recv(client,buf, sizeof(buf), 0);
           printf("Du lieu gui: \n");
           fgets(buf, 256, stdin);
-          if(strcmp(buf,NULL)) break;
+          if(strncmp(buf,"exit",4)==0) break;
           send(client, buf,strlen(buf), 0);
           if (ret==-1) printf("Loi");
           if (ret!=-1) printf("Gui du lieu thanh cong");

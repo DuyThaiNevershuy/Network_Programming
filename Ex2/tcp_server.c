@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-     printf("Da khoi tao server1!\n");
+     printf("Da khoi tao server thanh cong!\n");
 
      struct sockaddr_in client_addr;
      int client_addr_len = sizeof(client_addr);
@@ -40,13 +40,14 @@ int main(int argc, char *argv[]){
      //Khai bao ten file 
      char *filename_open = argv[2];
      char bufHello[256];     
-     char *filename_recv = argv[3];
+
 
      FILE *f = fopen(filename_open, "r");
      fgets(bufHello, 256, f);
      fclose(f);
      send(client, bufHello, strlen(bufHello), 0);
 
+     char *filename_recv = argv[3];
      f = fopen(filename_recv,"w");
      char bufRecv[2048];    
      int ret;
@@ -59,16 +60,16 @@ int main(int argc, char *argv[]){
             bufRecv[ret] = 0;
           }
 
-          if(strcmp(bufRecv, "NULL") == 0){
+          if(strncmp(bufRecv, "exit",4) == 0){
                break;
           }
 
           printf("%d bytes received: %s", ret, bufRecv);
           fprintf(f, "%s", bufRecv);
+          fclose(f);
      }
-     fclose(f);
+ 
      close(client);
      close(listener);
-     return 0;
 
 }
