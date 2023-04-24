@@ -8,16 +8,15 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <time.h>
-int main(int argc, char const *argv[]){
+int main(){
      int receiver = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-     if (receiver < 0)
-     {
-          perror("socket() failed");
-          exit(EXIT_FAILURE);
-     }
+     // if (receiver < 0)
+     // {
+     //      perror("socket() failed");
+     //      exit(EXIT_FAILURE);
+     // }
 
      struct sockaddr_in addr;
-     memset(&addr, 0, sizeof(addr));
      addr.sin_family = AF_INET;
      addr.sin_addr.s_addr = htonl(INADDR_ANY);
      addr.sin_port = htons(9000);
