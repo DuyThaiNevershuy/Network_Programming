@@ -10,11 +10,11 @@
 #include <time.h>
 int main(){
      int receiver = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-     // if (receiver < 0)
-     // {
-     //      perror("socket() failed");
-     //      exit(EXIT_FAILURE);
-     // }
+     if (receiver < 0)
+     {
+          perror("socket() failed");
+          exit(EXIT_FAILURE);
+     }
 
      struct sockaddr_in addr;
      addr.sin_family = AF_INET;

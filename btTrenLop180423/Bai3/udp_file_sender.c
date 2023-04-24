@@ -21,11 +21,11 @@ int main(int argc, char *argv[]){
      char file_name[1024];
      char res[2048];
 
-     FILE *f = fopen(argv[3],"*r");
-     // if(f==NULL){
-     //      perror("fopen() failed");
-     //      exit(EXIT_FAILURE);
-     // }
+     FILE *f = fopen(argv[3],"r");
+     if(f==NULL){
+          perror("fopen() failed");
+          exit(EXIT_FAILURE);
+     }
 
      fgets(buf, sizeof(buf), f);
      fclose(f);
@@ -35,6 +35,6 @@ int main(int argc, char *argv[]){
 
      int ret = sendto(sender, res, strlen(res), 0,(struct sockaddr *)&addr, sizeof(addr));
      
-     printf("Gui du lieu thanh cong");
+     printf("Gui du lieu thanh cong\n");
 
 }
