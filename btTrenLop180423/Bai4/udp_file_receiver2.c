@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <time.h>
+#define MAX_LENGTH 1024
 int main(int argc, char const *argv[]){
      int receiver = socket(AF_INET, SOCK_DGRAM,0);
      if (receiver < 0){
@@ -26,4 +27,27 @@ int main(int argc, char const *argv[]){
           perror("bind() failed");
           exit(EXIT_FAILURE);    
      }
+
+     char buf[MAX_LENGTH];
+    memset(buf, 0, MAX_LENGTH);
+    int bytes_received = 0;
+    while ((bytes_received = recvfrom(receiver, buf, MAX_LENGTH, 0, NULL, NULL)) > 0)
+    {
+          printf("Received %d bytes: %s\n", bytes_received, buf);
+          char *pos = strchr(buf, '-');
+          char filename[31];
+          memset(filename, 0, 31);
+          strncpy(filename, buf, pos - buf);
+          FILE *f = fopen(filename, "ab");
+          if (f == NULL)
+          {
+               perror("fopen() failed");
+               exit(EXIT_FAILURE);
+          }
+          fwrite(pos + 1, 1, strlen(pos + 1), f);
+          fclose(f);
+          memset(buf, 0, MAX_LENGTH);
+    }
+     close(receiver);
+     return 0;
 }
