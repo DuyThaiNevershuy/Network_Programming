@@ -102,8 +102,8 @@ int main(int argc,char*argv[] ){
                     count++;
                     printf("Client dia chi IP %s cong %d da ket noi\n",
                          inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-                    char *quesToCient = "Vui long nhap \"client_id: client_name\": ";
-                    if (send(client, quesToCient, strlen(quesToCient), 0) < 0)
+                    char *quesToClient = "Vui long nhap \"client_id: client_name\": ";
+                    if (send(client, quesToClient, strlen(quesToClient), 0) < 0)
                     {
                          perror("send() failed");
                          continue;
@@ -133,7 +133,7 @@ int main(int argc,char*argv[] ){
                     {
                          //Xoa client khoi mang
                          printf("Client %s:%d da ngat ket noi\n",inet_ntoa(clients[i].addr.sin_addr), ntohs(clients[i].addr.sin_port));
-                         for (int j = i; j < count - 1; j++)
+                         for (int j=i; j<count-1;j++)
                          {
                          clients[j] = clients[j + 1];
                          }
@@ -156,23 +156,24 @@ int main(int argc,char*argv[] ){
                               {
                                    strcpy(clients[i].id, id);
                                    strcpy(clients[i].name, name);
-                                   printf("Client tu %s:%d ket noi voi ID:NAME %s:%s\n", inet_ntoa(clients[i].addr.sin_addr), ntohs(clients[i].addr.sin_port), clients[i].id, clients[i].name);
+                                   printf("Client tu %s:%d ket noi voi ID:NAME: %s:%s\n", inet_ntoa(clients[i].addr.sin_addr), ntohs(clients[i].addr.sin_port), clients[i].id, clients[i].name);
                                    if (send(clients[i].sockfd, "Ban da ket noi thanh cong!\n", 35, 0) < 0)
                                    {
                                         perror("send() failed");
                                         continue;
                                    }
+                                   continue;
                               }
 
                               else
-                              {
-                                   if (send(clients[i].sockfd, "Sai cu phap, Moi nhap lai!\n", 35, 0) < 0)
+                              {    //Sai cu phap, Moi nhap lai
+                                   if (send(clients[i].sockfd, "Error,LOI!\n", 35, 0) < 0)
                                    {
                                         perror("send() failed");
                                         continue;
                                    }
-                                   char *quesToCient = "Vui long nhap \"client_id: client_name\": ";
-                                   if (send(clients[i].sockfd, quesToCient, strlen(quesToCient), 0) < 0)
+                                   char *quesToClient = "Vui long nhap \"client_id: client_name\": ";
+                                   if (send(clients[i].sockfd, quesToClient, strlen(quesToClient), 0) < 0)
                                    {
                                         perror("send() failed");
                                         continue;
@@ -190,9 +191,9 @@ int main(int argc,char*argv[] ){
                               char messages[MAX_MSG_LEN + 50];
                               memset(messages, 0, MAX_MSG_LEN + 50);
                               sprintf(messages, "%s %s: %s", time_str, clients[i].id, msg);
-                              for(int i=0;i<count;i++){
-                                   if(i!=1){
-                                        if(send(clients[i].sockfd, messages, strlen(messages), 0) < 0){
+                              for(int j=0;j<count;j++){
+                                   if(j!=i){
+                                        if(send(clients[j].sockfd, messages, strlen(messages), 0) < 0){
                                              perror("send() failed");
                                              continue;
                                         }
