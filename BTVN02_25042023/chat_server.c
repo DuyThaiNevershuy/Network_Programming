@@ -152,22 +152,24 @@ int main(int argc,char*argv[] ){
                          {
                               char id[10], name[50];
                               int res = sscanf(msg, "%[^:]: %s", id, name);
+                              printf("%d\n", res);
                               if (res==2)
                               {
                                    strcpy(clients[i].id, id);
                                    strcpy(clients[i].name, name);
                                    printf("Client tu %s:%d ket noi voi ID:NAME: %s:%s\n", inet_ntoa(clients[i].addr.sin_addr), ntohs(clients[i].addr.sin_port), clients[i].id, clients[i].name);
-                                   if (send(clients[i].sockfd, "Ban da ket noi thanh cong!\n", 35, 0) < 0)
+                                   if (send(clients[i].sockfd, "Ban da ket noi thanh cong!\n", 28, 0) < 0)
                                    {
                                         perror("send() failed");
                                         continue;
                                    }
                                    continue;
                               }
-
+                                   
                               else
                               {    //Sai cu phap, Moi nhap lai
-                                   if (send(clients[i].sockfd, "Error,LOI!\n", 35, 0) < 0)
+                                   printf("Lan 2: %d\n", res);
+                                   if (send(clients[i].sockfd, "Error,LOI!\n", 12, 0) < 0)
                                    {
                                         perror("send() failed");
                                         continue;
