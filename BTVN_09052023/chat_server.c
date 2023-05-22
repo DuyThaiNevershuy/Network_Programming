@@ -197,10 +197,6 @@ int main(int argc, char *argv[]){
                                 strcpy(clients[i].name, name);
                                 printf("Client tu %s:%d ket noi voi ID:NAME: %s:%s\n", inet_ntoa(clients[i].addr.sin_addr), ntohs(clients[i].addr.sin_port), clients[i].id, clients[i].name);
                                 char *str = "Ket noi voi ID NAME thanh cong!\n";
-                                // if(send(clients[i].sockfd, str, strlen(str), 0 <0)){
-                                //     perror("send(1) failed");
-                                //     continue;
-                                // }
                             }
                             else
                             {

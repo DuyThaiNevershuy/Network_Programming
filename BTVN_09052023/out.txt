@@ -1,0 +1,7 @@
+total 88
+-rw-rw-r-- 1 duythai duythai    51 Thg 5  22 15:46 Account_Data.txt
+-rwxrwxr-x 1 duythai duythai 28792 Thg 5  21 17:45 chat_server
+-rw-rw-r-- 1 duythai duythai 10813 Thg 5  21 17:44 chat_server.c
+-rw-rw-r-- 1 duythai duythai     0 Thg 5  22 22:39 out.txt
+-rwxrwxr-x 1 duythai duythai 28656 Thg 5  22 22:33 telnet_server
+-rw-rw-r-- 1 duythai duythai  9447 Thg 5  22 22:33 telnet_server.c

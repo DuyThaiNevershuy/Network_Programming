@@ -39,6 +39,8 @@ int checkAccount(char *username, char *password)
         // Tach ID va password
         char str_username[MAX_LEN];
         char str_password[MAX_LEN];
+        sscanf(line, "%s %s", str_username, str_password);
+
         if (strcmp(username, str_username) == 0 && strcmp(password, str_password) == 0)
         {
             fclose(file);
