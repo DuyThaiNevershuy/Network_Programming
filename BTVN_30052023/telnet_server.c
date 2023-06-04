@@ -167,79 +167,88 @@ int main(int argc, char *argv[])
         if (fork() == 0)
         {
             close(sockfd);
-        }
 
-        client_t clients;
-        memset(&clients, 0, sizeof(clients));
-        clients.sockfd = client;
-        clients.addr = client_addr;
-        strcpy(clients.username, "");
-        strcpy(clients.password, "");
+            client_t clients;
+            memset(&clients, 0, sizeof(clients));
+            clients.sockfd = client;
+            clients.addr = client_addr;
+            strcpy(clients.username, "");
+            strcpy(clients.password, "");
 
-        char *quesToClient = "Vui long nhap \"Username Password\": ";
-        if (send(client, quesToClient, strlen(quesToClient), 0) < 0)
-        {
-            perror("send() failed");
-            continue;
-        }
-
-        char buf[MAX_LEN];
-        while (1)
-        {
-            memset(buf, 0, sizeof(buf));
-
-            int bytes_recv = recv(client, buf, sizeof(buf),0);
-            if (bytes_recv < 0)
+            char *quesToClient = "Vui long nhap \"Username Password\": ";
+            if (send(client, quesToClient, strlen(quesToClient), 0) < 0)
             {
-                perror("recveive failed");
-                break;
+                perror("send() failed");
+                continue;
             }
 
-            else if (bytes_recv == 0)
+            char buf[MAX_LEN];
+            while (1)
             {
-                printf("Client %s:%d da ngat ket noi!\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-                break;
-            }
-            else
-            {
-                buf[strcspn(buf, "\n")] = 0;
+                memset(buf, 0, sizeof(buf));
 
-                if (strcmp(clients.username, "") == 0 && strcmp(clients.password, "") == 0)
+                int bytes_recv = recv(client, buf, sizeof(buf), 0);
+                if (bytes_recv < 0)
                 {
-                    char username[MAX_LEN];
-                    char password[MAX_LEN];
-                    char temp[MAX_LEN];
-                    int ret = sscanf(buf, "%s %s %s", username, password, temp);
-                    if (ret == 2)
+                    perror("recveive failed");
+                    break;
+                }
+
+                else if (bytes_recv == 0)
+                {
+                    printf("Client %s:%d da ngat ket noi!\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+                    break;
+                }
+                else
+                {
+                    buf[strcspn(buf, "\n")] = 0;
+
+                    if (strcmp(clients.username, "") == 0 && strcmp(clients.password, "") == 0)
                     {
-                        int stt = checkAco(username, password);
-                        if (stt == 1)
+                        char username[MAX_LEN];
+                        char password[MAX_LEN];
+                        char temp[MAX_LEN];
+                        int ret = sscanf(buf, "%s %s %s", username, password, temp);
+                        if (ret == 2)
                         {
-                            strcpy(clients.username, username);
-                            strcpy(clients.password, password);
-
-                            //Gui thong bao den client
-                            char *mess = "Dang nhap thanh cong!\nMoi ban nhap lenh: ";
-                            if (send(client, mess, strlen(mess), 0) < 0)
+                            int stt = checkAccount(username, password);
+                            if (stt == 1)
                             {
-                                perror("send() failed");
-                                continue;
+                                strcpy(clients.username, username);
+                                strcpy(clients.password, password);
+
+                                // Gui thong bao den client
+                                char *mess = "Dang nhap thanh cong!\nMoi ban nhap lenh: ";
+                                if (send(client, mess, strlen(mess), 0) < 0)
+                                {
+                                    perror("send() failed");
+                                    continue;
+                                }
                             }
-                        }
 
-                        else if(stt == 0)
-                        {
-                            // Thong tin dang nhap sai
-                            char *mess = "Tai khoan hoac mat khau sai!\nVui long nhap lai \"username password\": ";
-                            if (send(client, mess, strlen(mess), 0) < 0)
+                            else if (stt == 0)
                             {
-                                perror("send() failed");
-                                continue;
+                                // Thong tin dang nhap sai
+                                char *mess = "Tai khoan hoac mat khau sai!\nVui long nhap lai \"username password\": ";
+                                if (send(client, mess, strlen(mess), 0) < 0)
+                                {
+                                    perror("send() failed");
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                char *mess = "Loi file du lieu!\nVui long nhap lai \"username password\": ";
+                                if (send(client, mess, strlen(mess), 0) < 0)
+                                {
+                                    perror("send() failed");
+                                    continue;
+                                }
                             }
                         }
                         else
                         {
-                            char *mess = "Loi file du lieu!\nVui long nhap lai \"username password\": ";
+                            char *mess = "Ban da nhap sai dinh dang!\nVui long nhap dung theo dinh dang \"username password\": ";
                             if (send(client, mess, strlen(mess), 0) < 0)
                             {
                                 perror("send() failed");
@@ -247,6 +256,7 @@ int main(int argc, char *argv[])
                             }
                         }
                     }
+
                     else
                     {
                         if (strcmp(buf, "quit") == 0 || strcmp(buf, "exit") == 0)
@@ -261,16 +271,17 @@ int main(int argc, char *argv[])
                         }
                         else
                         {
-                            command(client,buf);
+                            command(client, buf);
                         }
                     }
                 }
             }
             close(client);
-            exit(EXIT_SUCCESS); //Thoat child process
+            exit(EXIT_SUCCESS); // Thoat child process
         }
         close(client);
     }
+
     close(sockfd);
     return 0;
 }
