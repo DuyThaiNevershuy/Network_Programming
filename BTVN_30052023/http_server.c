@@ -12,6 +12,23 @@
 
 #define MAX_CLIENT 10
 #define MAX_LEN 1024
+
+void formatTime(char buf[], const char*formar)
+{
+    time_t timeNow= time(NULL);
+}
+
+void signalHandler()
+{
+    int stt;
+    int pid = wait(&stt);
+    if (pid > 0)
+    {
+        printf("Luong con %d da bi tat voi trang thai %d!\n", pid, stt);
+    }
+    return;
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
