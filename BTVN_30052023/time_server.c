@@ -16,6 +16,43 @@
 #define MAX_CLIENT 10
 #define MAX_LEN 1024
 
+void signalHandler()
+{
+    int stt;
+    int pid = wait(&stt);
+    if (pid > 0)
+    {
+        printf("Luong con %d da bi tat voi trang thai %d!\n", pid, stt);
+    }
+    return;
+}
+
+void formatTime(char buf[], const char *format)
+{
+    time_t timeNow = time(NULL);
+    struct tm *timeinfo = localtime(&timeNow);
+    if (strcmp(format, "dd/mm/yyyy") == 0)
+    {
+        strftime(buf, MAX_LEN, "%d/%m/%Y\n", timeinfo);
+    }
+    else if (strcmp(format, "dd/mm/yy") == 0)
+    {
+        strftime(buf, MAX_LEN, "%d/%m/%y\n", timeinfo);
+    }
+    else if (strcmp(format, "mm/dd/yyyy") == 0)
+    {
+        strftime(buf, MAX_LEN, "%m/%d/%Y\n", timeinfo);
+    }
+    else if (strcmp(format, "mm/dd/yy") == 0)
+    {
+        strftime(buf, MAX_LEN, "%m/%d/%y\n", timeinfo);
+    }
+    else
+    {
+        strcpy(buf, "Sai dinh dang!\n");
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -52,7 +89,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    while(1)
+    while (1)
     {
         printf("\nCho ket noi cua client tai dia chi %s:%s\n", inet_ntoa(addr.sin_addr), argv[1]);
 
@@ -68,10 +105,10 @@ int main(int argc, char *argv[])
 
         printf("Client dia chi IP %s cong %d da ket noi\n",
                inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-        if(fork()==0)
+        if (fork() == 0)
         {
             close(sockfd);
-            while(1)
+            while (1)
             {
                 char *mess = "Moi nhap yeu cau: ";
                 if (send(client, mess, strlen(mess), 0) < 0)
@@ -81,13 +118,13 @@ int main(int argc, char *argv[])
                 }
                 char buf[MAX_LEN];
                 memset(buf, 0, MAX_LEN);
-                int len = recv(client,buf, MAX_LEN, 0);
-                if(len<0)
+                int len = recv(client, buf, MAX_LEN, 0);
+                if (len < 0)
                 {
                     perror("Receive failed");
                     break;
                 }
-                else if(len==0)
+                else if (len == 0)
                 {
                     printf("Client %s:%d da ngat ket noi!\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
                     break;
@@ -101,8 +138,51 @@ int main(int argc, char *argv[])
                         break;
                     }
 
+                    // Xu ly
+                    char cmd[MAX_LEN];
+                    char format[MAX_LEN];
+                    char temp[MAX_LEN];
+
+                    int ret = sscanf(buf, "%s %s %s", cmd, format, temp);
+                    if (ret == 2)
+                    {
+                        if (strcmp(cmd, "GET_TIME") == 0)
+                        {
+                            memset(buf, 0, MAX_LEN);
+                            formatTime(buf, format);
+                            if (send(client, buf, strlen(buf), 0) < 0)
+                            {
+                                perror("send() failed");
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            char *mess = "Sai cau lenh.Moi nhap lai dung dinh dang!\n";
+                            if (send(client, mess, strlen(mess), 0) < 0)
+                            {
+                                perror("send() failed");
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        char *messs = "Sai cau lenh!\n";
+                        if (send(client, mess, strlen(mess), 0) < 0)
+                        {
+                            perror("send() failed");
+                            break;
+                        }
+                    }
                 }
             }
+            close(client);
+            exit(EXIT_SUCCESS); // Ket thuc child process
         }
+        close(client);
     }
+    // Dong socket
+    close(sockfd);
+    return 0;
 }
