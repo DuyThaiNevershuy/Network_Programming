@@ -63,9 +63,9 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     printf("\nCho ket noi cua client tai dia chi %s:%s\n", inet_ntoa(server_addr.sin_addr), argv[1]);
-    while(1)
+    while (1)
     {
-        //Chap nhan ket noi tu server
+        // Chap nhan ket noi tu server
         struct sockaddr_in client_addr;
         memset(&client_addr, 0, sizeof(client_addr));
         socklen_t client_addr_len = sizeof(client_addr);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
         count++;
         pthread_mutex_unlock(&clients_mutex);
 
-        //Tao thread de xu ly client
+        // Tao thread de xu ly client
         pthread_t threadID;
         if (pthread_create(&threadID, NULL, processThread, (void *)&clients[count - 1]) != 0)
         {
@@ -114,4 +114,149 @@ void *processThread(void *para)
 {
     client_t *client = (client_t *)para;
     char buffer[MAX_LEN];
+    while (1)
+    {
+        // Yeu cau nhap ID va pass
+        char *quesToClient = "Vui long nhap \"client_id: client_name\": ";
+        if (send(client->sockfd, quesToClient, strlen(quesToClient), 0) < 0)
+        {
+            perror("send() failed");
+        }
+        memset(buffer, 0, MAX_LEN);
+
+        int mess_len = recv(clients->sockfd, buffer, MAX_LEN, 0);
+        if (mess_len < 0)
+        {
+            perror("recv() failed");
+        }
+
+        else if (mess_len == 0)
+        {
+            printf("Client co IP: %s - PORT: %d ngat ket noi\n", inet_ntoa(clients->addr.sin_addr), ntohs(clients->addr.sin_port));
+
+            // Gui thong bao den cac client khac
+            for (int i = 0; i < count; i++)
+            {
+                if (client->sockfd == clients[i].sockfd)
+                {
+                    pthread_mutex_lock(&clients_mutex);
+                    clients[i] = clients[count - 1];
+                    count--;
+                    if (count == 0)
+                    {
+                        printf("\nCho ket noi cua client tai dia chi %s:%d\n", inet_ntoa(server_addr.sin_addr), ntohs(server_addr.sin_port));
+                    }
+                    pthread_mutex_unlock(&clients_mutex);
+                    break;
+                }
+            }
+            return NULL;
+        }
+        else
+        {
+            buffer[strcspn(buffer, "\n")] = 0;
+
+            char id[MAX_LEN];
+            char name[MAX_LEN];
+            char temp[MAX_LEN];
+
+            int ret = sscanf(buffer, "%s %s %s", id, name, temp);
+            if (ret == 2)
+            {
+                int len = strlen(id);
+                if (id[len - 1] != ':')
+                {
+                    char *mess = "Nhap sai dinh dang. Moi nhap lai!\n";
+                    if (send(client->sockfd, mess, strlen(mess), 0) < 0)
+                    {
+                        perror("send() failed");
+                    }
+                    continue;
+                }
+                else
+                {
+                    id[len - 1] = 0;
+                    strcpy(client->id, id);
+                    strcpy(client->name, name);
+
+                    char *mess = "Moi nhap tin nhan den server!\n";
+                    if (send(client->sockfd, mess, strlen(mess), 0) < 0)
+                    {
+                        perror("send() failed");
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                char *mess = "Nhap sai dinh dang. Moi nhap lai!\n";
+                if (send(client->sockfd, mess, strlen(mess), 0) < 0)
+                {
+                    perror("send() failed");
+                }
+                continue;
+            }
+        }
+    }
+    while(1)
+    {
+        memset(buffer, 0, MAX_LEN);
+        int len = recv(client->sockfd, buffer, MAX_LEN, 0);
+        if (len < 0)
+        {
+            perror("recv() failed");
+        }
+        else if(len == 0)
+        {
+            printf("Client co IP: %s - PORT: %d ngat ket noi\n", inet_ntoa(clients->addr.sin_addr), ntohs(clients->addr.sin_port));
+            for (int i = 0; i < count; i++)
+            {
+                if (client->sockfd == clients[i].sockfd)
+                {
+                    pthread_mutex_lock(&clients_mutex);
+                    clients[i] = clients[count - 1];
+                    count--;
+                    if (count == 0)
+                    {
+                        printf("\nCho ket noi cua client tai dia chi %s:%d\n", inet_ntoa(server_addr.sin_addr), ntohs(server_addr.sin_port));
+                    }
+                    pthread_mutex_unlock(&clients_mutex);
+                    break;
+                }
+            }
+            break;
+        }
+        else
+        {
+            buffer[strcspn(buffer, "\n")] = 0;
+
+            // Dinh dang tin nhan gui
+            time_t now = time(NULL);
+            struct tm *t = localtime(&now);
+            char time_str[22];
+            memset(time_str, 0, 22);
+            strftime(time_str, MAX_LEN, "%Y/%m/%d %I:%M:%S%p", t);
+            char messSend[MAX_LEN + 58];
+            sprintf(messSend, "\n%s %s: %s\n\n", time_str, client->id, buffer);
+
+            // Gui tin nhan sang cac client khac
+            for (int i = 0; i < count; i++)
+            {
+                if (client->sockfd != clients[i].sockfd)
+                {
+                    if (strcmp(clients[i].id, "") == 0)
+                    {
+                        continue;
+                    }
+                    if (send(clients[i].sockfd, messSend, strlen(messSend), 0) < 0)
+                    {
+                        perror("send() failed");
+                    }
+                }
+            }
+        }
+    }
+    return NULL;
 }
+
+
