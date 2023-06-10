@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    int sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (sockfd < 0)
+    int server = socket(AF_INET, SOCK_STREAM, 0);
+    if (server < 0)
     {
         perror("socket() failed");
         exit(EXIT_FAILURE);
@@ -50,14 +50,14 @@ int main(int argc, char *argv[])
     server_addr.sin_port = htons(atoi(argv[1]));
 
     // Gan dia chi server vao socket
-    if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    if (bind(server, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
         perror("bind() failed");
         exit(EXIT_FAILURE);
     }
 
     // Chuyen server sang trang thai lang nghe
-    if (listen(sockfd, MAX_CLIENT) < 0)
+    if (listen(server, MAX_CLIENT) < 0)
     {
         perror("listen() failed");
         exit(EXIT_FAILURE);
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         struct sockaddr_in client_addr;
         memset(&client_addr, 0, sizeof(client_addr));
         socklen_t client_addr_len = sizeof(client_addr);
-        int client = accept(sockfd, (struct sockaddr *)&client_addr, &client_addr_len);
+        int client = accept(server, (struct sockaddr *)&client_addr, &client_addr_len);
         if (client < 0)
         {
             perror("accept() failed");
@@ -78,11 +78,11 @@ int main(int argc, char *argv[])
         if (count == MAX_CLIENT)
         {
             char *msg = "Server da day, Vui long thu lai sau!\n";
-            if (send(sockfd, msg, strlen(msg), 0) < 0)
+            if (send(server, msg, strlen(msg), 0) < 0)
             {
                 perror("send() failed");
             }
-            close(sockfd);
+            close(client);
             continue;
         }
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
         }
         pthread_detach(threadID);
     }
-    close(sockfd);
+    close(server);
     return 0;
 }
 
