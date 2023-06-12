@@ -179,7 +179,7 @@ void *processThread(void *para)
                     strcpy(client->id, id);
                     strcpy(client->name, name);
 
-                    char *mess = "Moi nhap tin nhan den server!\n";
+                    char *mess = "Moi nhap tin nhan:\n";
                     if (send(client->sockfd, mess, strlen(mess), 0) < 0)
                     {
                         perror("send() failed");
