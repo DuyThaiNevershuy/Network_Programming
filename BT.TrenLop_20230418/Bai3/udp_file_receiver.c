@@ -29,7 +29,7 @@ int main(){
 
      char buf[2048];
      while(1){
-          int ret = recvfrom(receiver, buf, sizeof(buf),0,NULL,NULL);
+          int ret = recvfrom(receiver, buf, sizeof(buf),0,0,0);
           if(ret<=0) break;
           
           buf[ret]=0;
