@@ -91,9 +91,9 @@ void requestCommand(int client_socket, const char *request, const char *root) {
         struct stat path_stat;
         if (stat(file_path, &path_stat) == 0) {
             if (S_ISDIR(path_stat.st_mode)) {
-                handle_directory(client_socket, file_path);
+                executeDir(client_socket, file_path);
             } else if (S_ISREG(path_stat.st_mode)) {
-                handle_file(client_socket, file_path);
+                executeFile(client_socket, file_path);
             } else {
                 send_response(client_socket, "404 Not Found");
             }
@@ -108,7 +108,7 @@ void requestCommand(int client_socket, const char *request, const char *root) {
 int main(int argc, char *argv[])
 {
     int server_socket, client_socket;
-    struct sockaddr_in server_addr, client_address;
+    struct sockaddr_in server_address, client_address;
     socklen_t client_address_size = sizeof(client_address);
 
     int server = socket(AF_INET, SOCK_STREAM, 0);
