@@ -141,4 +141,33 @@ int main(int argc, char *argv[])
 
     printf("Server dang cho tai cong: %d\n", DEFAULT_PORT);
 
+    const char *root = DEFAULT_ROOT;
+    if (argc >= 2) {
+        root = argv[1];
+    }
+
+    while(1)
+    {
+        client_socket = accept(socket, (struct sockaddr *)&client_address, &client_address_size);
+        if(client_socket < 0)
+        {
+            perror("Connect() fail");
+            return 1;
+        }
+
+        char request[MAX_LEN];
+        memset(request, 0, MAX_LEN);
+
+        // Doc yeu cau cua client
+        recv(client_socket, request, MAX_LEN - 1, 0);
+        printf("Request:\n%s\n", request);
+
+        // Thuc hien yeu cau cua client
+        requestCommand(client_socket, request, root);
+
+        // Client ngat ket noi
+        close(client_socket); 
+    }
+    close(server);
+    return 0;
 }
