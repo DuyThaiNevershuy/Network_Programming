@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
                     printf("----------------------------\n");
                     printf("Mode: %s\n", mode == 1 ? "active" : "passive");
                     printf("-------- FTP Client --------\n");
-                    printf("0. Doi che don");
+                    printf("0. Doi che don\n");
                     printf("1. Upload file\n");
                     printf("2. Dang xuat\n");
                     printf("----------------------------\n");
