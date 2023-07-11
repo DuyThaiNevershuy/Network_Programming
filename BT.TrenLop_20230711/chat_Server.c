@@ -543,12 +543,9 @@ int main(int argc, char *argv[])
             pthread_create(&tid, NULL, client_handler, (void *)client);
         }
     }
-
     // Đóng socket
     close(server_socket);
-
     // Hủy mutex
     pthread_mutex_destroy(&room_mutex);
-
     return 0;
 }
